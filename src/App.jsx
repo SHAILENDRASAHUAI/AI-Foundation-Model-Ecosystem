@@ -78,6 +78,11 @@ const highlights = [
   'Multimodal product expansion',
 ]
 
+const ORBIT_CENTER_X = 500
+const ORBIT_CENTER_Y = 310
+const ORBIT_OUTER_RADIUS = 246
+const ORBIT_INNER_RADIUS = 172
+
 const getNode = (id) => nodes.find((node) => node.id === id)
 
 function App() {
@@ -86,6 +91,18 @@ function App() {
   const [glow, setGlow] = useState({ x: 50, y: 50 })
 
   const activeNode = getNode(activeNodeId)
+  const connectedPeers = useMemo(
+    () => {
+      let total = 0
+      for (const [from, to] of links) {
+        if (from === activeNodeId || to === activeNodeId) {
+          total += 1
+        }
+      }
+      return total
+    },
+    [activeNodeId],
+  )
 
   const stats = useMemo(
     () => [
@@ -145,7 +162,7 @@ function App() {
 
             <defs>
               <linearGradient id="linkGradient" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#7dd3fc" stopOpacity="0.8" />
+                <stop offset="0%" stopColor="#7dd3fc" stopOpacity="0.55" />
                 <stop offset="100%" stopColor="#c084fc" stopOpacity="0.35" />
               </linearGradient>
               <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -157,8 +174,8 @@ function App() {
               </filter>
             </defs>
 
-            <circle cx="500" cy="310" r="246" className="orbit" />
-            <circle cx="500" cy="310" r="172" className="orbit orbit-mid" />
+            <circle cx={ORBIT_CENTER_X} cy={ORBIT_CENTER_Y} r={ORBIT_OUTER_RADIUS} className="orbit" />
+            <circle cx={ORBIT_CENTER_X} cy={ORBIT_CENTER_Y} r={ORBIT_INNER_RADIUS} className="orbit orbit-mid" />
 
             {links.map(([from, to]) => {
               const fromNode = getNode(from)
@@ -226,7 +243,7 @@ function App() {
             </div>
             <div>
               <dt>Connected peers</dt>
-              <dd>{links.filter(([from, to]) => from === activeNode.id || to === activeNode.id).length}</dd>
+              <dd>{connectedPeers}</dd>
             </div>
           </dl>
           <ul className="trend-list">
