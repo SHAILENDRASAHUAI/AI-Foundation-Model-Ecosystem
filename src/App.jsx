@@ -90,18 +90,19 @@ function App() {
   const [activeNodeId, setActiveNodeId] = useState(nodes[0].id)
   const [glow, setGlow] = useState({ x: 50, y: 50 })
 
-  const activeNode = getNode(activeNodeId)
+  const activeNode = getNode(activeNodeId) ?? nodes[0]
+  const resolvedActiveNodeId = activeNode.id
   const connectedPeers = useMemo(
     () => {
-      let total = 0
+      let connectionCount = 0
       for (const [from, to] of links) {
-        if (from === activeNodeId || to === activeNodeId) {
-          total += 1
+        if (from === resolvedActiveNodeId || to === resolvedActiveNodeId) {
+          connectionCount += 1
         }
       }
-      return total
+      return connectionCount
     },
-    [activeNodeId],
+    [resolvedActiveNodeId],
   )
 
   const stats = useMemo(
@@ -195,7 +196,7 @@ function App() {
             {nodes.map((node) => (
               <g
                 key={node.id}
-                className={`graph-node ${activeNodeId === node.id ? 'active' : ''}`}
+                className={`graph-node ${resolvedActiveNodeId === node.id ? 'active' : ''}`}
                 tabIndex={0}
                 onMouseMove={(event) => showTooltip(node, event.clientX, event.clientY)}
                 onMouseEnter={(event) => showTooltip(node, event.clientX, event.clientY)}
